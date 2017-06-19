@@ -5,7 +5,8 @@ RUN apt-get update -y
 RUN apt-get install -y \
       libqt5webkit5-dev \
       qt5-default \
-      xvfb
+      xvfb \
+      redis-tools
 
 # from https://github.com/nodejs/docker-node/blob/6948057bbd9cc1469ca0e5e64d3bd5f000d4dc97/6.9/Dockerfile
 RUN groupadd --gid 1000 node \
