@@ -3,10 +3,28 @@ FROM ruby:2.5.0
 RUN apt-get update -y
 
 RUN apt-get install -y \
-      libqt5webkit5-dev \
-      qt5-default \
       xvfb \
+      zip \
+      unzip \
       redis-tools
+
+
+# from https://github.com/circleci/circleci-images/blob/master/shared/images/Dockerfile-browsers.template
+RUN curl --silent --show-error --location --fail --retry 3 --output /tmp/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+      && (dpkg -i /tmp/google-chrome-stable_current_amd64.deb || apt-get -fy install)  \
+      && rm -rf /tmp/google-chrome-stable_current_amd64.deb \
+      && sed -i 's|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox --no-sandbox|g' \
+           "/opt/google/chrome/google-chrome" \
+      && google-chrome --version
+
+RUN export CHROMEDRIVER_RELEASE=$(curl --location --fail --retry 3 http://chromedriver.storage.googleapis.com/LATEST_RELEASE) \
+      && curl --silent --show-error --location --fail --retry 3 --output /tmp/chromedriver_linux64.zip "http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_RELEASE/chromedriver_linux64.zip" \
+      && cd /tmp \
+      && unzip chromedriver_linux64.zip \
+      && rm -rf chromedriver_linux64.zip \
+      && mv chromedriver /usr/local/bin/chromedriver \
+      && chmod +x /usr/local/bin/chromedriver \
+      && chromedriver --version
 
 # from https://github.com/nodejs/docker-node/blob/2924f142789842282890f7b1736578b49b3be78f/8.5/Dockerfile
 RUN groupadd --gid 1000 node \
@@ -105,3 +123,16 @@ RUN set -x  \
 
 # ENTRYPOINT ["dumb-init"]
 # CMD ["phantomjs"]
+
+# from https://github.com/circleci/circleci-images/blob/master/shared/images/Dockerfile-browsers.template
+# start xvfb automatically to avoid needing to express in circle.yml
+ENV DISPLAY :99
+RUN printf '#!/bin/sh\nXvfb :99 -screen 0 1280x1024x24 &\nexec "$@"\n' > /tmp/entrypoint \
+  && chmod +x /tmp/entrypoint \
+        && mv /tmp/entrypoint /docker-entrypoint.sh
+
+# ensure that the build agent doesn't override the entrypoint
+LABEL com.circleci.preserve-entrypoint=true
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/bin/sh"]
