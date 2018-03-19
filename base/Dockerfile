@@ -6,7 +6,8 @@ RUN apt-get install -y \
       xvfb \
       zip \
       unzip \
-      redis-tools
+      redis-tools \
+      libnss3-tools
 
 
 # from https://github.com/circleci/circleci-images/blob/master/shared/images/Dockerfile-browsers.template
