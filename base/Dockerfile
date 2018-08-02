@@ -9,23 +9,33 @@ RUN apt-get install -y \
       redis-tools \
       libnss3-tools
 
+RUN FIREFOX_URL='https://ftp.mozilla.org/pub/firefox/releases/61.0.2/linux-x86_64/en-US/firefox-61.0.2.tar.bz2' \
+  && apt-get purge firefox \
+  && apt-get install -y libgtk-3-dev libdbus-glib-1-dev \
+  && curl --silent --show-error --location --fail --retry 3 --output /tmp/firefox.tar.bz2 $FIREFOX_URL \
+  && tar -xjf /tmp/firefox.tar.bz2 -C /tmp \
+  && mv /tmp/firefox /opt/firefox \
+  && ln -s /opt/firefox/firefox /usr/bin/firefox \
+  && rm -rf /tmp/firefox.tar.bz2 \
+  && rm -rf /tmp/firefox \
+  && firefox --version
 
 # from https://github.com/circleci/circleci-images/blob/master/shared/images/Dockerfile-browsers.template
 RUN curl --silent --show-error --location --fail --retry 3 --output /tmp/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
-      && (dpkg -i /tmp/google-chrome-stable_current_amd64.deb || apt-get -fy install)  \
-      && rm -rf /tmp/google-chrome-stable_current_amd64.deb \
-      && sed -i 's|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox --no-sandbox|g' \
-           "/opt/google/chrome/google-chrome" \
-      && google-chrome --version
+  && (dpkg -i /tmp/google-chrome-stable_current_amd64.deb || apt-get -fy install)  \
+  && rm -rf /tmp/google-chrome-stable_current_amd64.deb \
+  && sed -i 's|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox --no-sandbox|g' \
+       "/opt/google/chrome/google-chrome" \
+  && google-chrome --version
 
 RUN export CHROMEDRIVER_RELEASE=$(curl --location --fail --retry 3 http://chromedriver.storage.googleapis.com/LATEST_RELEASE) \
-      && curl --silent --show-error --location --fail --retry 3 --output /tmp/chromedriver_linux64.zip "http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_RELEASE/chromedriver_linux64.zip" \
-      && cd /tmp \
-      && unzip chromedriver_linux64.zip \
-      && rm -rf chromedriver_linux64.zip \
-      && mv chromedriver /usr/local/bin/chromedriver \
-      && chmod +x /usr/local/bin/chromedriver \
-      && chromedriver --version
+  && curl --silent --show-error --location --fail --retry 3 --output /tmp/chromedriver_linux64.zip "http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_RELEASE/chromedriver_linux64.zip" \
+  && cd /tmp \
+  && unzip chromedriver_linux64.zip \
+  && rm -rf chromedriver_linux64.zip \
+  && mv chromedriver /usr/local/bin/chromedriver \
+  && chmod +x /usr/local/bin/chromedriver \
+  && chromedriver --version
 
 # from https://github.com/nodejs/docker-node/blob/2924f142789842282890f7b1736578b49b3be78f/8.5/Dockerfile
 RUN groupadd --gid 1000 node \
