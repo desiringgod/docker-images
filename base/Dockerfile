@@ -9,7 +9,7 @@ RUN apt-get install -y \
       redis-tools \
       libnss3-tools
 
-RUN FIREFOX_URL='https://ftp.mozilla.org/pub/firefox/releases/61.0.2/linux-x86_64/en-US/firefox-61.0.2.tar.bz2' \
+RUN FIREFOX_URL='https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US' \
   && apt-get purge firefox \
   && apt-get install -y libgtk-3-dev libdbus-glib-1-dev \
   && curl --silent --show-error --location --fail --retry 3 --output /tmp/firefox.tar.bz2 $FIREFOX_URL \
