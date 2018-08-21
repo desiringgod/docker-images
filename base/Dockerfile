@@ -19,6 +19,15 @@ RUN FIREFOX_URL='https://download.mozilla.org/?product=firefox-latest-ssl&os=lin
   && rm -rf /tmp/firefox \
   && firefox --version
 
+RUN GECKODRIVER_URL='https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-linux64.tar.gz' \
+  && curl --silent --show-error --location --fail --retry 3 --output /tmp/geckodriver.tar.gz $GECKODRIVER_URL \
+  && tar -xzvf /tmp/geckodriver.tar.gz -C /tmp \
+  && mv /tmp/geckodriver /opt/geckodriver \
+  && ln -s /opt/geckodriver /usr/bin/geckodriver \
+  && rm -rf /tmp/geckodriver.tar.gz \
+  && rm -rf /tmp/geckodriver \
+  && geckodriver --version
+
 # from https://github.com/nodejs/docker-node/blob/2924f142789842282890f7b1736578b49b3be78f/8.5/Dockerfile
 RUN groupadd --gid 1000 node \
   && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
