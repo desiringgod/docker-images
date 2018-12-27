@@ -19,7 +19,7 @@ RUN FIREFOX_URL='https://download.mozilla.org/?product=firefox-latest-ssl&os=lin
   && rm -rf /tmp/firefox \
   && firefox --version
 
-RUN GECKODRIVER_URL='https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-linux64.tar.gz' \
+RUN GECKODRIVER_URL='https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz' \
   && curl --silent --show-error --location --fail --retry 3 --output /tmp/geckodriver.tar.gz $GECKODRIVER_URL \
   && tar -xzvf /tmp/geckodriver.tar.gz -C /tmp \
   && mv /tmp/geckodriver /opt/geckodriver \
