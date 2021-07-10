@@ -1,4 +1,4 @@
-FROM ruby:2.6.7-stretch
+FROM ruby:3.0.1
 
 RUN apt-get update -y
 
